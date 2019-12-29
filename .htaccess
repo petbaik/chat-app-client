@@ -5,9 +5,8 @@
 
     RewriteEngine On
 
-    RewriteCond %{HTTPS} !=on
-    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} !^public [L,R=301]
     
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -29,5 +28,7 @@
     RewriteRule ^(css|js|images)/(.*)$ public/$1/$2 [L,NC]
 
     
-
+    
+    RewriteCond %{SERVER_PORT} 80
+    RewriteRule ^(.*)$ https://pbaykov.online/$1 [R,L]
 </IfModule>
