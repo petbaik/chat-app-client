@@ -29,6 +29,7 @@
 
     
     
-    RewriteCond %{HTTP:X-Forwarded-Proto} !https
-    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} !^public [L,R=301]
+    RewriteCond %{HTTP:X-Forwarded-Proto} !=https [NC]
+    RewriteCond %{REQUEST_URI} !^/?(api/list|api/categories) [NC]
+    RewriteRule https://%{HTTP_HOST}/%{REQUEST_URI} [R=301,L]
 </IfModule>
