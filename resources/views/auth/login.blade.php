@@ -19,7 +19,7 @@
 
 <form method="POST" action="{{ route('login') }}" class="form-signin">
     <h1 class="h3 mb-3 font-weight-normal">Вход</h1>
-    {{ csrf_field() }}
+    @csrf
 
     <label for="email" class="sr-only">Email</label>
 
