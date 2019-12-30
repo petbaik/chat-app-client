@@ -113,9 +113,9 @@
     </div>
     <!-- Chat Box-->
     <div class="col-7 px-0">
-      <div class="px-4 py-5 chat-box bg-white">
-      
-        <chat-messages></chat-messages>
+      <div class="px-4 py-5  bg-white">
+
+        <chat-messages default_messages="{{ $chat }}"></chat-messages>
 
         <send-message></send-message>
 

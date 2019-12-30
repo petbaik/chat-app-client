@@ -1838,19 +1838,41 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_1__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 //
 //
 //
 //
 //
 //
+
+
 /* harmony default export */ __webpack_exports__["default"] = ({
+  computed: _objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapGetters"])(['messages'])),
+  props: ['default_messages'],
   created: function created() {
     var _this = this;
 
+    this.$store.commit('messages/add', JSON.parse(this.default_messages));
+    console.log(JSON.parse(this.default_messages));
     this.sockets.subscribe('message', function (data) {
-      console.log("received message", data);
-      _this.msg = data.message;
+      if (data.sender_id != _this.$userId) {
+        axios__WEBPACK_IMPORTED_MODULE_1___default.a.post('/chat/save-message', {
+          sender_id: data.sender_id,
+          receiver_id: _this.$userId,
+          message: data.message
+        });
+      }
+
+      _this.$store.commit('message/add', data);
     });
   }
 });
@@ -1879,7 +1901,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ __webpack_exports__["default"] = ({});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  computed: {
+    userId: function userId() {
+      return this.$userId;
+    }
+  },
+  props: ['message'],
+  created: function created() {}
+});
 
 /***/ }),
 
@@ -1901,12 +1940,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      message: null
+    };
+  },
   methods: {
-    sendMessage: function sendMessage() {
-      this.$socket.emit('message', {
-        msg: "Hello"
-      });
+    sendMessage: function sendMessage(e) {
+      if (typeof e.keyCode == "undefined" || typeof e.keyCode != "undefined" && e.keyCode == 13) {
+        this.$socket.emit('message', {
+          message: this.message,
+          sender_id: this.$userId
+        });
+        this.message = null;
+      }
     }
   }
 });
@@ -37305,7 +37356,14 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_c("message")], 1)
+  return _c(
+    "div",
+    { staticClass: "chat-box" },
+    _vm._l(_vm.messages, function(message, key) {
+      return _c("message", { key: key, attrs: { message: message } })
+    }),
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -37329,30 +37387,47 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", [
-      _c("div", { staticClass: "media w-50 ml-auto mb-3" }, [
-        _c("div", { staticClass: "media-body" }, [
-          _c("div", { staticClass: "bg-primary rounded py-2 px-3 mb-2" }, [
-            _c("p", { staticClass: "text-small mb-0 text-white" }, [
-              _vm._v("Test which is a new approach to have all solutions")
+  return _c("div", [
+    _vm.message.sender_id == _vm.userId
+      ? _c("div", { staticClass: "media w-50 ml-auto mb-3" }, [
+          _c("div", { staticClass: "media-body" }, [
+            _c("div", { staticClass: "bg-primary rounded py-2 px-3 mb-2" }, [
+              _c("p", { staticClass: "text-small mb-0 text-white" }, [
+                _vm._v(_vm._s(_vm.message.message))
+              ])
+            ]),
+            _vm._v(" "),
+            _c("p", { staticClass: "small text-muted" }, [
+              _vm._v("12:00 PM | Aug 13")
             ])
-          ]),
-          _vm._v(" "),
-          _c("p", { staticClass: "small text-muted" }, [
-            _vm._v("12:00 PM | Aug 13")
           ])
         ])
-      ])
-    ])
-  }
-]
+      : _c("div", { staticClass: "media w-50 mb-3" }, [
+          _c("img", {
+            staticClass: "rounded-circle",
+            attrs: {
+              src:
+                "https://res.cloudinary.com/mhmd/image/upload/v1564960395/avatar_usae7z.svg",
+              alt: "user",
+              width: "50"
+            }
+          }),
+          _vm._v(" "),
+          _c("div", { staticClass: "media-body ml-3" }, [
+            _c("div", { staticClass: "bg-light rounded py-2 px-3 mb-2" }, [
+              _c("p", { staticClass: "text-small mb-0 text-muted" }, [
+                _vm._v(_vm._s(_vm.message.message))
+              ])
+            ]),
+            _vm._v(" "),
+            _c("p", { staticClass: "small text-muted" }, [
+              _vm._v("12:00 PM | Aug 13")
+            ])
+          ])
+        ])
+  ])
+}
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -37374,22 +37449,38 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "input-group bg-light" }, [
-    _c("input", {
-      staticClass: "form-control rounded-0 border-0 py-4 bg-light",
-      attrs: {
-        type: "text",
-        placeholder: "Type a message",
-        "aria-describedby": "button-addon2"
-      }
-    }),
-    _vm._v(" "),
-    _c("div", { staticClass: "input-group-append" }, [
-      _c(
-        "button",
-        { staticClass: "btn btn-link", on: { click: _vm.sendMessage } },
-        [_c("i", { staticClass: "fa fa-paper-plane" })]
-      )
+  return _c("div", { staticClass: "input-box py-4" }, [
+    _c("div", { staticClass: "input-group bg-light" }, [
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.message,
+            expression: "message"
+          }
+        ],
+        staticClass: "form-control rounded-0 border-0 py-4 bg-light",
+        attrs: { type: "text", placeholder: "Type a message" },
+        domProps: { value: _vm.message },
+        on: {
+          keyup: _vm.sendMessage,
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.message = $event.target.value
+          }
+        }
+      }),
+      _vm._v(" "),
+      _c("div", { staticClass: "input-group-append" }, [
+        _c(
+          "button",
+          { staticClass: "btn btn-link", on: { click: _vm.sendMessage } },
+          [_c("i", { staticClass: "fa fa-paper-plane" })]
+        )
+      ])
     ])
   ])
 }
@@ -50684,6 +50775,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 Vue.component('message', __webpack_require__(/*! ./components/Message.vue */ "./resources/js/components/Message.vue")["default"]);
 Vue.component('chat-messages', __webpack_require__(/*! ./components/ChatMessages.vue */ "./resources/js/components/ChatMessages.vue")["default"]);
 Vue.component('send-message', __webpack_require__(/*! ./components/SendMessage.vue */ "./resources/js/components/SendMessage.vue")["default"]);
+Vue.prototype.$userId = document.querySelector("meta[name='user-id']").getAttribute('content');
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -50981,7 +51073,12 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ({});
+/* harmony default export */ __webpack_exports__["default"] = ({
+  messages: function messages(_ref) {
+    var _messages = _ref.messages;
+    return _messages;
+  }
+});
 
 /***/ }),
 
@@ -51017,6 +51114,22 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
 
 /***/ }),
 
+/***/ "./resources/js/store/mutation-types.js":
+/*!**********************************************!*\
+  !*** ./resources/js/store/mutation-types.js ***!
+  \**********************************************/
+/*! exports provided: MESSAGE_ADD, MESSAGES_ADD */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MESSAGE_ADD", function() { return MESSAGE_ADD; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MESSAGES_ADD", function() { return MESSAGES_ADD; });
+var MESSAGE_ADD = 'message/add';
+var MESSAGES_ADD = 'messages/add';
+
+/***/ }),
+
 /***/ "./resources/js/store/mutations.js":
 /*!*****************************************!*\
   !*** ./resources/js/store/mutations.js ***!
@@ -51026,7 +51139,25 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ({});
+/* harmony import */ var _mutation_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./mutation-types */ "./resources/js/store/mutation-types.js");
+var _types$MESSAGE_ADD$ty;
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+
+/* harmony default export */ __webpack_exports__["default"] = (_types$MESSAGE_ADD$ty = {}, _defineProperty(_types$MESSAGE_ADD$ty, _mutation_types__WEBPACK_IMPORTED_MODULE_0__["MESSAGE_ADD"], function (state, payload) {
+  state.messages = [].concat(_toConsumableArray(state.messages), [payload]);
+}), _defineProperty(_types$MESSAGE_ADD$ty, _mutation_types__WEBPACK_IMPORTED_MODULE_0__["MESSAGES_ADD"], function (state, payload) {
+  state.messages = payload;
+}), _types$MESSAGE_ADD$ty);
 
 /***/ }),
 

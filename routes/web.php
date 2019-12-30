@@ -15,3 +15,7 @@ Route::get('/', 'HomeController@index');
 
 Auth::routes();
 
+Route::group(['prefix' => 'chat'], function() {
+    Route::post('/save-message', 'ChatController@saveMessage');
+});
+

@@ -25,7 +25,7 @@ import VueSocketIO from 'vue-socket.io'
 Vue.component('message', require('./components/Message.vue').default);
 Vue.component('chat-messages', require('./components/ChatMessages.vue').default);
 Vue.component('send-message', require('./components/SendMessage.vue').default);
-
+Vue.prototype.$userId = document.querySelector("meta[name='user-id']").getAttribute('content');
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
